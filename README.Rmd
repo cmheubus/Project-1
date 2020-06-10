@@ -1,34 +1,74 @@
 ---
-title: "ST 558 - Project 1 - Heubusch"
+title: "ST 558 - Project 1 - Christine Marie Heubusch"
 output: 
   html_document: 
     toc: yes
     toc_depth: 2
 author: "Christine Marie Heubusch"
 date: "June 12, 2020"
-
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Understanding JSON Data
+
+## What is JSON data?
+JavaScript Object Notation (JSON) is ... 
+
+What is it, where does it get used, and why is it a good way to store data? This should be detailed enough that someone that hasn’t seen JSON data would have a good idea what they are dealing with. You should link to references where applicable.
+
+## Packages Used for Reading JSON Data
+Discuss the possible packages/functions that are available for reading JSON data into R. (There are three major packages for JSON data.) Choose one and explain why you’ve chosen it.
+
+# Contacting the NHL API
+```{r Loading Packages, messages=FALSE}
+library(httr)
+library(jsonlite) 
+library(tidyverse)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+str(iris)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+base_url
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r Creating URL for Accessing Franchise}
+base_url <- "https://records.nhl.com/site/api"
+full_url_franchise <- GET(paste0(base_url, "/", "franchise"))
+franchise_txt <- content(full_url, "text")
+franchise_json <- fromJSON(franchise_txt, flatten=TRUE)
+#str(franchise_json)
+#franchise_df <- as.data.frame(franchise_json)
+#MIGHT NEED TO DO A JOIN INSTEAD? 
+#franchise_tbl<- as_tibble(franchise_df)
+#franchise_tbl
+```
+
+```{r Creating URL for Accessing Franchise Team Totals}
+full_url_TT <- GET(paste0(base_url, "/", "franchise-team-totals"))
+TT_txt <- content(full_url_TT, "text")
+TT_json <- fromJSON(TT_txt, flatten=TRUE)
+TT_df <- as.data.frame(TT_json[1])
+
+#MIGHT NEED TO DO A JOIN INSTEAD TO AVOID LOSING DATA?
+#TT_df %>% arrange(data.goalsFor)
+#TT_tbl <- as_tibble(TT_df)
+#TT_tbl #ISSUE with DATA. appearing at the beginning of every variable column name
+```
+
+```{r Creating URL for Accessing Franchise Season Records}
+base_url <- "https://records.nhl.com/site/api"
+franchiseID <-"1"
+full_url_SR <- GET(paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseID=", franchiseID))
+```
+
+
+# Exploring Exploratory Data Analysis
+MUST: 
+* Create a new variable at some point  
+* Create some contingency tables and numeric summaries for some of your categorical variables
+* Create some plots (_at least_ a side-by-side bar plot, side-by-side box plots, and scatter plots with coloring)
+
