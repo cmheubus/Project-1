@@ -25,48 +25,80 @@ library(jsonlite)
 library(tidyverse)
 ```
 
-```{r}
-str(iris)
+```{r Creating Function for Accessing Franchise}
+# MUST FIGURE OUT HOW TO GET RID OF THE ARRAY NAME? Data. 
+api_function_franchise <- function(x) {
+  base_url <- "https://records.nhl.com/site/api" 
+  x <- "franchise"
+  full_url <- paste0(base_url, "/", x) 
+  franchise_get <- GET(full_url) 
+  franchise_txt <- content(franchise_get, "text") 
+  franchise_json <- fromJSON(franchise_txt, flatten=TRUE)
+  franchise_df <- as.data.frame(franchise_json)
+  return(franchise_df)
+}
+api_function_franchise(x)
 ```
 
-
-```{r}
-base_url
+```{r Creating Function for Accessing Team Totals}
+api_function_totals <- function(x) {
+  base_url <- "https://records.nhl.com/site/api" 
+   x <- "franchise-team-totals"
+  full_url <- paste0(base_url, "/", x) 
+  team_totals_get <- GET(full_url) 
+  team_totals_txt <- content(team_totals_get, "text") 
+  team_totals_json <- fromJSON(team_totals_txt, flatten=TRUE)
+  team_totals_df <- as.data.frame(team_totals_json)
+  return(team_totals_df)
+}
+api_function_totals(x)
 ```
 
-
-```{r Creating URL for Accessing Franchise}
-base_url <- "https://records.nhl.com/site/api"
-full_url_franchise <- GET(paste0(base_url, "/", "franchise"))
-franchise_txt <- content(full_url, "text")
-franchise_json <- fromJSON(franchise_txt, flatten=TRUE)
-#str(franchise_json)
-#franchise_df <- as.data.frame(franchise_json)
-#MIGHT NEED TO DO A JOIN INSTEAD? 
-#franchise_tbl<- as_tibble(franchise_df)
-#franchise_tbl
+```{r Creating Function for Accessing Season Records}
+api_function_season <- function(ID) {
+  base_url <- "https://records.nhl.com/site/api" 
+  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", ID) 
+  season_get <- GET(full_url) 
+  season_txt <- content(season_get, "text") 
+  season_json <- fromJSON(season_txt, flatten=TRUE)
+  season_df <- as.data.frame(season_json)
+  return(season_df)
+}
+api_function_season(1) #Testing the function 
 ```
 
-```{r Creating URL for Accessing Franchise Team Totals}
-full_url_TT <- GET(paste0(base_url, "/", "franchise-team-totals"))
-TT_txt <- content(full_url_TT, "text")
-TT_json <- fromJSON(TT_txt, flatten=TRUE)
-TT_df <- as.data.frame(TT_json[1])
-
-#MIGHT NEED TO DO A JOIN INSTEAD TO AVOID LOSING DATA?
-#TT_df %>% arrange(data.goalsFor)
-#TT_tbl <- as_tibble(TT_df)
-#TT_tbl #ISSUE with DATA. appearing at the beginning of every variable column name
+```{r Creating Function for Accessing Goalie Records}
+api_function_goalie <- function(ID) {
+  base_url <- "https://records.nhl.com/site/api" 
+  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", ID) 
+  goalie_get <- GET(full_url) 
+  goalie_txt <- content(goalie_get, "text") 
+  goalie_json <- fromJSON(goalie_txt, flatten=TRUE)
+  goalie_df <- as.data.frame(goalie_json)
+  return(goalie_df)
+}
+api_function_goalie(1) #Testing the function 
 ```
 
-```{r Creating URL for Accessing Franchise Season Records}
-base_url <- "https://records.nhl.com/site/api"
-franchiseID <-"1"
-full_url_SR <- GET(paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseID=", franchiseID))
+```{r Creating Function for Accessing Skater Records}
+api_function_skater <- function(ID) {
+  base_url <- "https://records.nhl.com/site/api" 
+  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", ID) 
+  skater_get <- GET(full_url) 
+  skater_txt <- content(skater_get, "text") 
+  skater_json <- fromJSON(skater_txt, flatten=TRUE)
+  skater_df <- as.data.frame(skater_json)
+  return(skater_df)
+}
+api_function_skater(1) #Testing the function 
 ```
-
 
 # Exploring Exploratory Data Analysis
+
+```{r}
+
+```
+
 MUST: 
 * Create a new variable at some point  
 * Create some contingency tables and numeric summaries for some of your categorical variables
