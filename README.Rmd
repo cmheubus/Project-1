@@ -120,7 +120,12 @@ view(api_function_skater(17)) #Testing the function - sure, I suppose I'll look 
 
 ## Is an Team With More Recorded Shutouts More Likely to Still be an Active Franchise? 
 
-Create a new variable 
+
+```{r}
+team_totals_table <- table(team_totals_data$activeFranchise, team_totals_data$firstSeasonId)
+kable(team_totals_table)
+```
+
 ```{r Creating shutoutRange Variable}
 team_totals_data <- mutate(team_totals_data, shutoutRange = 
                              ifelse(shutouts %in% 0:50, "0-50",
@@ -130,20 +135,14 @@ team_totals_data <- mutate(team_totals_data, shutoutRange =
 team_totals_data$shutoutRange <- factor(team_totals_data$shutoutRange, levels=c("0-50", "51-100", "101-150","151+")) #Changed these values to factors so that they could be easily ordered for the barplot below. 
 ```
 
-```{r}
-team_totals_data <- mutate(team_totals_data, yearRange = 
-                             ifelse(firstSeasonId %in% 19001901:19241925, "1900-1925",
-                                ifelse(firstSeasonId %in% 19261927:19501951, "1926-1950",
-                                ifelse(firstSeasonId %in% 19511952:19751976, ""))))
-```
-
-```{r}
-team_totals_data <- 
-```
-
 ```{r Contingency Table of Active or Non-Active Franchise vs. Shutouts}
 shutoutTable <- table(team_totals_data$activeFranchise, team_totals_data$shutoutRange)
 kable(shutoutTable, caption="Table of Active or Non-Active Franchise vs. Total Number of Shutouts")
+```
+
+```{r Creating a Numeric Summary of the Shutouts}
+shutoutsSummary<- summary(team_totals_data$shutouts)
+shutoutsSummary
 ```
 
 ```{r}
@@ -154,22 +153,12 @@ shutoutGraph + geom_bar(aes(fill=as.factor(activeFranchise))) +
   coord_flip()
 ```
 
-
+"For ice hockey, the goals against average statistic is the number of goals a goaltender allows per 60 minutes of playing time. It is calculated by taking the number of goals against, multiply that by 60 (minutes) and then dividing by the number of minutes played." (![https://en.wikipedia.org/wiki/Goals_against_average#:~:text=For%20ice%20hockey%2C%20the%20goals,the%20number%20of%20minutes%20played.])
 
 ## Are Teams more Likely to Win at Home than Away? 
 
 We've heard of "home-field" advantage - let's see if the same can be said of the rink.
 
-```{r}
-team_totals_hist <- ggplot(team_totals_data, aes(x=homeLosses))
-team_totals_hist +
-  geom_histogram() +
-  ggtitle("This is A Test 2")
-```
-
-
-
-"For ice hockey, the goals against average statistic is the number of goals a goaltender allows per 60 minutes of playing time. It is calculated by taking the number of goals against, multiply that by 60 (minutes) and then dividing by the number of minutes played." (![https://en.wikipedia.org/wiki/Goals_against_average#:~:text=For%20ice%20hockey%2C%20the%20goals,the%20number%20of%20minutes%20played.])
 
 
 ##Do Aggressive Teams Tend to Win More? 
@@ -208,3 +197,38 @@ penalty_plot +
   ggtitle("Boxplot of Average Time Spent in Penalty Box") +
   labs (x="Ratio of Total Minutes in Penalty Box to Total Number of Games Played", y="'Winning' or 'Losing' Team?")
 ```
+
+There does not appear to be a straight-line relationship between the amount of time that a team spends in the penalty box and its "win-loss" ratio. Looking at the distribution of the points, it seems that there may be a "sweet spot" - perhaps indicating that making certain illegal or more aggressive plays that could be risky, but be rewarding. 
+
+```{r}
+ratiosScatter <- ggplot(team_totals_data, aes(x=penaltyGamesRatio, y=winLossRatio))
+ratiosScatter +
+  geom_point() +
+  geom_smooth() + 
+  ggtitle("Scatterplot of Average Time Spent in Penalty Box vs. Win-Loss Ratio") + 
+  labs(x="Average Time Spent in Penalty Box", y="Win-Loss Ratio")
+```
+
+## Do Newer Teams Tend to be More Aggressive? 
+
+```{r}
+post2000Penalties<- team_totals_data %>% 
+  filter(firstSeasonId >= 20002000) %>% 
+  select(teamName, penaltyGamesRatio, firstSeasonId) %>% 
+  arrange(desc(penaltyGamesRatio))
+summary(post2000Penalties$penaltyGamesRatio)
+```
+
+```{r}
+pre2000Penalties <- team_totals_data %>% 
+  filter(firstSeasonId < 20002000) %>% 
+  select(teamName, penaltyGamesRatio, firstSeasonId) %>% 
+  arrange(desc(penaltyGamesRatio))
+summary(pre2000Penalties$penaltyGamesRatio)
+```
+
+
+
+
+
+
