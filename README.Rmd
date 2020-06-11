@@ -11,15 +11,22 @@ date: "June 12, 2020"
 # Understanding JSON Data
 
 ## What is JSON data?
-JavaScript Object Notation (JSON) is ... 
-
 What is it, where does it get used, and why is it a good way to store data? This should be detailed enough that someone that hasn’t seen JSON data would have a good idea what they are dealing with. You should link to references where applicable.
+
+![JavaScript Object Notation (JSON)](https://www.json.org/json-en.html) is a format of storing data that is "lightweight" (that is, tends to be a small file size) and integrates well with most programming languages, though it is technically a subset of JavaScript. These properties make it a favorite format for application programming interfaces (APIs) and is often used to !["serialize and transfer data over a network connection"](https://www.w3resource.com/JSON/introduction.php). In JSON, ![data can be stored in a variety of different ways](https://www.youtube.com/watch?v=iiADhChRriM&list=TLPQMTAwNjIwMjBzt1zaeUU28g&index=2), including strings, numbers, booleans (with the true/false operators), arrays, and null. While objects are wrapped with a left and right curly brace ({}), arrays are enclosed in brackets ([]). Objects contain ![key-value pairs](https://www.w3schools.com/js/js_json_objects.asp), with the key being a string, a value being one of the aformed JSON data types, and a colon separating the two; each key-value pair is separated with a comma. Values may be nested in a JSON data object, which makes it both convenient and easy to read.
 
 ## Packages Used for Reading JSON Data
 Discuss the possible packages/functions that are available for reading JSON data into R. (There are three major packages for JSON data.) Choose one and explain why you’ve chosen it.
 
+Three R packages can be utilized for working with JSON data: 
+* `rjson`
+* `RJSONIO`  
+* `jsonlite` 
+
+All three packages offer options for converting to/from JSON. `RJSONIO` was originally introduced as a ![faster alternative](https://www.rdocumentation.org/packages/RJSONIO/versions/1.3-1.4) to `rjson`, given concerns about the latter's slower speeds, though there are some indications that `rjson` may now actaully be faster in certain circumstances. I have selected `jsonlite` - which debuted in 2014 and originally ![started as a branch of `RJSONIO`](https://cran.r-project.org/web/packages/jsonlite/index.html#:~:text=In%20addition%20to%20converting%20JSON,data%20in%20systems%20and%20applications.) - as my package of choice. Documentation on the package is extensive, as evidenced by the package's thorough ![vignette](https://cran.r-project.org/web/packages/jsonlite/jsonlite.pdf); and a wide variety of useful functions and options are within. Interestingly, only `RJSONIO` and `jsonlite` ![give control over vector simplification](https://rstudio-pubs-static.s3.amazonaws.com/31702_9c22e3d1a0c44968a4a1f9656f1800ab.html), an important consideration when parsing JSON data.
+
 # Contacting the NHL API
-```{r Loading Packages, messages=FALSE}
+```{r Loading Packages, warnings=FALSE}
 library(httr)
 library(jsonlite) 
 library(tidyverse)
@@ -33,17 +40,19 @@ api_function_franchise <- function(x) {
   full_url <- paste0(base_url, "/", x) 
   franchise_get <- GET(full_url) 
   franchise_txt <- content(franchise_get, "text") 
-  franchise_json <- fromJSON(franchise_txt, flatten=TRUE)
+  franchise_json <- fromJSON(franchise_txt, flatten=TRUE, simplifyDataFrame=TRUE)
   franchise_df <- as.data.frame(franchise_json)
   return(franchise_df)
 }
-api_function_franchise(x)
+franchise_data <- api_function_franchise(x)
+#view(franchise_data)
+head(franchise_data)
 ```
 
 ```{r Creating Function for Accessing Team Totals}
 api_function_totals <- function(x) {
   base_url <- "https://records.nhl.com/site/api" 
-   x <- "franchise-team-totals"
+  x <- "franchise-team-totals"
   full_url <- paste0(base_url, "/", x) 
   team_totals_get <- GET(full_url) 
   team_totals_txt <- content(team_totals_get, "text") 
@@ -51,20 +60,28 @@ api_function_totals <- function(x) {
   team_totals_df <- as.data.frame(team_totals_json)
   return(team_totals_df)
 }
-api_function_totals(x)
+team_totals_data <- api_function_totals(x)
+#view(team_totals_data)
+head(team_totals_data)
 ```
 
 ```{r Creating Function for Accessing Season Records}
 api_function_season <- function(ID) {
   base_url <- "https://records.nhl.com/site/api" 
   full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", ID) 
+  pages <-list()
+  for(i in 0:20) {
+    
+  }
   season_get <- GET(full_url) 
   season_txt <- content(season_get, "text") 
   season_json <- fromJSON(season_txt, flatten=TRUE)
   season_df <- as.data.frame(season_json)
   return(season_df)
 }
-api_function_season(1) #Testing the function 
+view(api_function_season(1)) #Testing the function 
+
+
 ```
 
 ```{r Creating Function for Accessing Goalie Records}
@@ -77,7 +94,13 @@ api_function_goalie <- function(ID) {
   goalie_df <- as.data.frame(goalie_json)
   return(goalie_df)
 }
-api_function_goalie(1) #Testing the function 
+list_goalie <- list(0)
+new_function_goalie <- function(x){
+  
+}
+
+view(api_function_goalie(1)) #Testing the function 
+
 ```
 
 ```{r Creating Function for Accessing Skater Records}
@@ -90,14 +113,54 @@ api_function_skater <- function(ID) {
   skater_df <- as.data.frame(skater_json)
   return(skater_df)
 }
-api_function_skater(1) #Testing the function 
+view(api_function_skater(1)) #Testing the function 
 ```
 
-# Exploring Exploratory Data Analysis
+# Exploratory Data Analysis
 
+"For ice hockey, the goals against average statistic is the number of goals a goaltender allows per 60 minutes of playing time. It is calculated by taking the number of goals against, multiply that by 60 (minutes) and then dividing by the number of minutes played." (![https://en.wikipedia.org/wiki/Goals_against_average#:~:text=For%20ice%20hockey%2C%20the%20goals,the%20number%20of%20minutes%20played.])
+
+The higher the goals against, the higher the number of losses. 
 ```{r}
+#NEED TO COME UP WITH A CATEGORICAL VARIABLE FOR Y 
+#losses_plot<- ggplot(team_totals_data, aes(x=data.goalsAgainst, y=))
+#losses_plot + 
+ # geom_point() +
+  # geom_smooth(method=lm, color="blue") + 
+  #ggtitle("Goals Against vs. Losses")
+```
+
+```{r Creating Variable of Win-Loss Ratio}
+team_totals_data %>% 
+  mutate(
+  win_loss_ratio = team_totals_data$data.wins / team_totals_data$data.losses
+  )
 
 ```
+
+
+Skewed right - low-scoring game. Do density instead? 
+```{r Histogram of Points Scored}
+points_plot<- ggplot(team_totals_data, aes(x=data.points))
+points_plot + 
+  geom_histogram() +
+  ggtitle("")
+```
+
+Do a ratio of penalty minutes : games played instead, to make it more equitable? 
+```{r}
+team_totals_data %>% 
+  mutate(
+  games_penalty_ratio = team_totals_data$data.gamesPlayed / team_totals_data$ data.penaltyMinutes
+  ) 
+
+penalty_plot <- ggplot(team_totals_data, aes(x=teams_totals_data$`games_penalty_ratio`,y=""))
+penalty_plot + 
+  geom_boxplot(fill="white") +
+  geom_point(position="jitter") + 
+  ggtitle("Boxplot of Penalty Minutes")
+```
+
 
 MUST: 
 * Create a new variable at some point  
