@@ -20,9 +20,10 @@ What is it, where does it get used, and why is it a good way to store data? This
 Discuss the possible packages/functions that are available for reading JSON data into R. (There are three major packages for JSON data.) Choose one and explain why you’ve chosen it.
 
 Three R packages can be utilized for working with JSON data: 
-* `rjson`
+
+* `rjson`  
 * `RJSONIO`  
-* `jsonlite` 
+* `jsonlite`  
 
 All three packages offer options for converting to/from JSON. `RJSONIO` was originally introduced as a [faster alternative](https://www.rdocumentation.org/packages/RJSONIO/versions/1.3-1.4) to `rjson`, given concerns about the latter's slower speeds, though there are some indications that `rjson` may now actaully be faster in certain circumstances. I have selected `jsonlite` - which debuted in 2014 and originally [started as a branch of `RJSONIO`](https://cran.r-project.org/web/packages/jsonlite/index.html#:~:text=In%20addition%20to%20converting%20JSON,data%20in%20systems%20and%20applications.) - as my package of choice. Documentation on the package is extensive, as evidenced by the package's thorough [vignette](https://cran.r-project.org/web/packages/jsonlite/jsonlite.pdf); and a wide variety of useful functions and options are within. Interestingly, only `RJSONIO` and `jsonlite` [give control over vector simplification](https://rstudio-pubs-static.s3.amazonaws.com/31702_9c22e3d1a0c44968a4a1f9656f1800ab.html), an important consideration when parsing JSON data.
 
@@ -81,7 +82,8 @@ api_function_season <- function(franchiseID) {
   colnames(season_df) <- str_remove(colnames(season_df), "data.") 
   return(season_df)
 }
-view(api_function_season(24)) #Testing the function with Washington Capitals data, since I'm originally from the DC area!
+seasonCaps <- api_function_season(24) #Testing the function with Washington Capitals data, since I'm originally from the DC area!
+seasonCaps
 ```
 
 ```{r Creating Function for Accessing Goalie Records}
@@ -95,11 +97,8 @@ api_function_goalie <- function(franchiseID) {
   colnames(goalie_df) <- str_remove(colnames(goalie_df), "data.")
   return(goalie_df)
 }
-list_goalie <- list(0)
-new_function_goalie <- function(x){
-}
 
-view(api_function_goalie(26)) #Testing the function with Carolina Hurricanes data, to honor my "new home"! Maybe I'll even use their colors later on...
+goalieCanes<- api_function_goalie(26) #Testing the function with Carolina Hurricanes data, to honor my "new home"! Maybe I'll even use their colors later on...
 ```
 
 ```{r Creating Function for Accessing Skater Records}
@@ -113,13 +112,17 @@ api_function_skater <- function(franchiseID) {
   colnames(skater_df) <- str_remove(colnames(skater_df), "data.")
   return(skater_df)
 }
-view(api_function_skater(17)) #Testing the function - sure, I suppose I'll look at some Penguins data too! 
+skaterPenguins <- api_function_skater(17) #Testing the function - sure, I suppose I'll look at some Penguins data too! 
 ```
 
 # Exploratory Data Analysis
 
-## Is an Team With More Recorded Shutouts More Likely to Still be an Active Franchise? 
+```{r}
+#newTotals <- team_totals_table %>%
+ #select(teamName, gamesPlayed, wins, losses)
+```
 
+## Is an Team With More Recorded Shutouts More Likely to Still be an Active Franchise? 
 
 ```{r}
 team_totals_table <- table(team_totals_data$activeFranchise, team_totals_data$firstSeasonId)
@@ -146,6 +149,7 @@ shutoutsSummary
 ```
 
 ```{r}
+#CUSTOMIZE COLORS
 shutoutGraph<- ggplot(data=team_totals_data, aes(x=shutoutRange))
 shutoutGraph + geom_bar(aes(fill=as.factor(activeFranchise))) + 
   labs(x="Total Number of Shutouts", title="Bar Plot of Number of Shutouts") + 
@@ -158,6 +162,40 @@ shutoutGraph + geom_bar(aes(fill=as.factor(activeFranchise))) +
 ## Are Teams more Likely to Win at Home than Away? 
 
 We've heard of "home-field" advantage - let's see if the same can be said of the rink.
+Ratio of RoadWin:RoadLoss and HomeWin:HomeLoss, then do 
+Did not count ties
+```{r Create roadWinToLossRatio variable}
+team_totals_data <- mutate(team_totals_data, roadWinToLossRatio = roadWins / roadLosses)
+team_totals_data <- mutate(team_totals_data, homeWinToLossRatio = homeWins / homeLosses)
+team_totals_data
+```
+
+```{r}
+penalty_plot <- ggplot(team_totals_data, aes(x=roadWinToLossRatio,y=""))
+penalty_plot + 
+  geom_boxplot(fill="#cc0000") +
+  ggtitle("Boxplot of Road Wins to Losses") +
+  labs(x="Ratio of Road Wins, Divided by Road Losses", y="")
+```
+
+```{r Creating Histogram of Road Wins to Losses Ratio}
+roadWinsLossesHist <- ggplot(team_totals_data, aes(x=roadWinToLossRatio))
+roadWinsLossesHist +
+  geom_histogram(aes(y=..density..), binwidth=0.25) + 
+  ggtitle("Histogram of Road Wins : Losses Ratio")
+```
+
+```{r Creating Histogram of Home Wins to Losses Ratio}
+homeWinsLossesHist <- ggplot(team_totals_data, aes(x=homeWinToLossRatio))
+homeWinsLossesHist +
+  geom_histogram(aes(y=..density..), binwidth=0.25) + 
+  ggtitle("Histogram of Home Wins : Losses Ratio")
+```
+
+Is a team that wins when home more likely to win when away? 
+```{r}
+
+```
 
 
 
