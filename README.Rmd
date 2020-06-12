@@ -15,7 +15,6 @@ date: "June 12, 2020"
 [JavaScript Object Notation (JSON)](https://www.json.org/json-en.html) is a format of storing data that is "lightweight" (that is, tends to be a small file size) and integrates well with most programming languages, though it is technically a subset of JavaScript. These properties make it a favorite format for application programming interfaces (APIs) and is often used to ["serialize and transfer data over a network connection"](https://www.w3resource.com/JSON/introduction.php). In JSON, [data can be stored in a variety of different ways](https://www.youtube.com/watch?v=iiADhChRriM&list=TLPQMTAwNjIwMjBzt1zaeUU28g&index=2), including strings, numbers, booleans (with the true/false operators), arrays, and null. While objects are wrapped with a left and right curly brace ({}), arrays are enclosed in brackets ([]). Objects contain [key-value pairs](https://www.w3schools.com/js/js_json_objects.asp), with the key being a string, a value being one of the aformed JSON data types, and a colon separating the two; each key-value pair is separated with a comma. Values may be nested in a JSON data object, which makes it both convenient and easy to read.
 
 ## Packages Used for Reading JSON Data
-Discuss the possible packages/functions that are available for reading JSON data into R. (There are three major packages for JSON data.) Choose one and explain why you’ve chosen it.
 
 Three R packages can be utilized for working with JSON data: 
 
@@ -23,7 +22,7 @@ Three R packages can be utilized for working with JSON data:
 * `RJSONIO`  
 * `jsonlite`  
 
-All three packages offer options for converting to/from JSON. `RJSONIO` was originally introduced as a [faster alternative](https://www.rdocumentation.org/packages/RJSONIO/versions/1.3-1.4) to `rjson`, given concerns about the latter's slower speeds, though there are some indications that `rjson` may now actaully be faster in certain circumstances. I have selected `jsonlite` - which debuted in 2014 and originally [started as a branch of `RJSONIO`](https://cran.r-project.org/web/packages/jsonlite/index.html#:~:text=In%20addition%20to%20converting%20JSON,data%20in%20systems%20and%20applications.) - as my package of choice. Documentation on the package is extensive, as evidenced by the package's thorough [vignette](https://cran.r-project.org/web/packages/jsonlite/jsonlite.pdf); and a wide variety of useful functions and options are within. Interestingly, only `RJSONIO` and `jsonlite` [give control over vector simplification](https://rstudio-pubs-static.s3.amazonaws.com/31702_9c22e3d1a0c44968a4a1f9656f1800ab.html), an important consideration when parsing JSON data.
+All three packages offer options for converting to/from JSON. `RJSONIO` was originally introduced as a [faster alternative](https://www.rdocumentation.org/packages/RJSONIO/versions/1.3-1.4) to `rjson`, given concerns about the latter's slower speeds, though there are some indications that `rjson` may now actually be faster in certain circumstances. I have selected `jsonlite`, which debuted in 2014 and originally [started as a branch of `RJSONIO`](https://cran.r-project.org/web/packages/jsonlite/index.html#:~:text=In%20addition%20to%20converting%20JSON,data%20in%20systems%20and%20applications.), as my package of choice. Documentation on the package is extensive, as evidenced by the package's thorough [vignette](https://cran.r-project.org/web/packages/jsonlite/jsonlite.pdf); and a wide variety of useful functions and options are within. Interestingly, only `RJSONIO` and `jsonlite` [give control over vector simplification](https://rstudio-pubs-static.s3.amazonaws.com/31702_9c22e3d1a0c44968a4a1f9656f1800ab.html), an important consideration when parsing JSON data.
 
 # Contacting the NHL API
 ```{r Loading Packages, include=FALSE}
@@ -73,9 +72,9 @@ head(team_totals_data)
 
 ## Creating a Function for Accessing Season Records
 ```{r Creating Function for Accessing Season Records, message=FALSE}
-api_function_season <- function(franchiseID) {
+api_function_season <- function(ID) {
   base_url <- "https://records.nhl.com/site/api" 
-  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", franchiseID) 
+  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", ID) 
   season_get <- GET(full_url) 
   season_txt <- content(season_get, "text") 
   season_json <- fromJSON(season_txt, flatten=TRUE)
@@ -89,9 +88,9 @@ seasonCaps <- api_function_season(24) #Testing the function with Washington Capi
 
 ## Creating a Function for Accessing Goalie Records
 ```{r Creating Function for Accessing Goalie Records, message=FALSE}
-api_function_goalie <- function(franchiseID) {
+api_function_goalie <- function(ID) {
   base_url <- "https://records.nhl.com/site/api" 
-  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", franchiseID) 
+  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", ID) 
   goalie_get <- GET(full_url) 
   goalie_txt <- content(goalie_get, "text") 
   goalie_json <- fromJSON(goalie_txt, flatten=TRUE)
@@ -105,9 +104,9 @@ goalieCanes<- api_function_goalie(26) #Testing the function with Carolina Hurric
 
 ## Creating a Function for Accessing Skater Records
 ```{r Creating Function for Accessing Skater Records, message=FALSE}
-api_function_skater <- function(franchiseID) {
+api_function_skater <- function(ID) {
   base_url <- "https://records.nhl.com/site/api" 
-  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", franchiseID) 
+  full_url <- paste0(base_url, "/", "franchise-season-records?cayenneExp=franchiseId=", ID) 
   skater_get <- GET(full_url) 
   skater_txt <- content(skater_get, "text") 
   skater_json <- fromJSON(skater_txt, flatten=TRUE)
@@ -115,7 +114,7 @@ api_function_skater <- function(franchiseID) {
   colnames(skater_df) <- str_remove(colnames(skater_df), "data.")
   return(skater_df)
 }
-skaterPenguins <- api_function_skater(17) #Testing the function - sure, I suppose I'll look at some Penguins data too! 
+skaterPenguins <- api_function_skater(17) #Testing the function - I'll look at some Penguins data too! 
 #view(skaterPenguins)
 ```
 
@@ -123,7 +122,7 @@ skaterPenguins <- api_function_skater(17) #Testing the function - sure, I suppos
 
 ## Is a Team With More Recorded Shutouts More Likely to Still be an Active Franchise? 
 
-In a [shutout game](https://en.wikipedia.org/wiki/Shutout), a hockey team's defense manages to prevent the other team from scoring any points throughout the entirety of the game - surely, a sign of strong performance! To begin, I decided to created a categorical variable called **shutoutRange**, creating ranges for total number of shutouts and using `ifelse` to assign each value to the appropriate level of the new variable. I then created a contingency table to get a quick glimpse of how many active (and inactive) franchises fell within each category. Not too surprisingly, none of the teams that had a history of over a 100 shutouts were inactive. To visualize this data, I created a barplot, filling the bars with color based upon whether or not the franchise is active.
+In a [shutout game](https://en.wikipedia.org/wiki/Shutout), a hockey team's defense manages to prevent the other team from scoring any points throughout the entirety of the game - surely, a sign of the franchise's strong performance! To begin, I decided to created a categorical variable called **shutoutRange**, usuing the `mutate` function to create ranges for total number of shutouts and `ifelse` to assign each value to the appropriate level of the new variable. I then created a contingency table to get a quick glimpse of how many active (and inactive) franchises fell within each category. Not too surprisingly, none of the teams that had a history of over a 100 shutouts were inactive. To visualize this data, I created a barplot, filling the bars with color based upon whether or not the franchise is active.
 
 ```{r Creating shutoutRange Variable}
 team_totals_data <- mutate(team_totals_data, shutoutRange = 
@@ -149,10 +148,10 @@ shutoutGraph + geom_bar(aes(fill=as.factor(activeFranchise))) +
 
 ## Are Teams more Likely to Win at Home than Away? 
 
-We've heard of home-"field" advantage - let's see if the same can be said of the rink.I began by creating another two variables: 
+We've heard of home-"field" advantage - let's see if the same can be said of the rink. I began by creating another two variables: 
 
-* **roadWinLossRatio**, AKA total number of wins on the road divided by total number of losses on the road  
-* **homeWinLossRaio**, AKA total number of losses at home divided by total number of wins on the road  
+* **roadWinLossRatio**, AKA total number of wins on the road divided by total number of losses on the road.  
+* **homeWinLossRatio**, AKA total number of losses at home divided by total number of wins on the road.  
 
 *For this purposes of this variable, I did not include ties.*
 
@@ -161,7 +160,7 @@ team_totals_data <- mutate(team_totals_data, roadWinLossRatio = roadWins / roadL
 team_totals_data <- mutate(team_totals_data, homeWinLossRatio = homeWins / homeLosses)
 
 team_totals_data %>%
-  select(teamName, roadWinLossRatio, homeWinLossRatio) %>%
+  select(teamName, roadWins, roadLosses, roadWinLossRatio, homeWins, homeLosses, homeWinLossRatio) %>%
   arrange(teamName) %>%
   head()
 ```
@@ -176,14 +175,14 @@ homeWLR <- summary(team_totals_data$homeWinLossRatio)
 homeWLR
 ```
 
-Looking at the mean and median win-to-loss ratios for on the road (or "away") and home, we see that both the home mean and median ratios are nearly double for home games - perhaps indicating that a team is more likely to win when it's playing on its own ice. We can then look at boxplots of these ratios, as a visual representation of these summary statistics.  
+Looking at the mean and median Win-Loss ratios for on the road (or "away") and home games, we see that both the home mean and median ratios are nearly double that of away games - perhaps indicating that a team is more likely to win when it's playing on its own ice. We can then look at boxplots of these ratios, as a visual representation of these summary statistics. The distributions appear slightly skewed, with the Road Win-Loss ratio being slightly skewed left, and the Home Win-Loss Ratio appearing skewed right, likely due to its outlier. Looking at the data, we can identify this outlier as the Toronto Arenas franchise (with a game type ID of 2); however, we also note that they only played a total of 20 games at home, winning 15 - giving them their extraordinary Win-Loss Ratio of 3.0. 
 
 ```{r Creating Boxplot of roadWinToLossRatio}
 penalty_plot <- ggplot(team_totals_data, aes(x=roadWinLossRatio,y=""))
 penalty_plot + 
   geom_boxplot(fill="#cc0000") +
   ggtitle("Boxplot of Ratio of Road Wins to Road Losses") +
-  labs(x="Ratio of Road Wins, Divided by Road Losses", y="")
+  labs(y="")
 ```
 
 ```{r Creating Boxplot of home WinLossRatio, warning=FALSE}
@@ -191,28 +190,32 @@ penalty_plot <- ggplot(team_totals_data, aes(x=homeWinLossRatio,y=""))
 penalty_plot + 
   geom_boxplot(fill="#cc0000") +
   ggtitle("Boxplot of Ratio of Home Wins to Home Losses") +
-  labs(x="Ratio of Home Wins, Divided by Home Losses", y="")
+  labs(y="")
+
+#team_totals_data %>% select(teamName, homeWinLossRatio) %>% view()
+#We can see that the outlier, with a homeWinLossRatio of 3 is the Toronto Arenas. 
+
 ```
 
-```{r Creating Histogram of Road Wins to Losses Ratio}
+```{r Creating Histogram of Road Wins to Road Losses Ratio}
 roadWinsLossesHist <- ggplot(team_totals_data, aes(x=roadWinLossRatio))
 roadWinsLossesHist +
   geom_histogram(aes(y=..density..), binwidth=0.25) + 
-  ggtitle("Histogram of Road Wins : Losses Ratio")
+  geom_density(kernal="gaussian")
+  ggtitle("Histogram of Road Wins to Road Losses Ratio")
 ```
 
-```{r Creating Histogram of Home Wins to Losses Ratio, warning=FALSE}
+```{r Creating Histogram of Home Wins to Home Losses Ratio, warning=FALSE}
 homeWinsLossesHist <- ggplot(team_totals_data, aes(x=homeWinLossRatio))
 homeWinsLossesHist +
   geom_histogram(aes(y=..density..), binwidth=0.25) + 
-  ggtitle("Histogram of Home Wins : Losses Ratio")
+  geom_density(kernal="gaussian") + 
+  ggtitle("Histogram of Home Wins to Home Losses Ratio")
 ```
 
 ## Do Aggressive Teams Tend to Win More? 
 
-Do teams that spend more time in the penalty box tend to win more? To help explore this question, I created two new variables from the Franchise Team Totals dataset (that is, R object team_totals_data). 
-
-Here, I used the `mutate` function from the `dplyr` package to create a new variable called **penaltyGamesRatio** - the total number of minutes spent in the penalty box, divided by the total number of games played. This variable is intended to display the average amount of time per game a team's players spend in penalty - perhaps a larger number is indicative of a more "aggressive" playing style. 
+Do teams that spend more time in the penalty box tend to win more? To help explore this question, I created another new variable called **penaltyGamesRatio** - the total number of minutes spent in the penalty box, divided by the total number of games played. This variable is intended to display the average amount of time per game a team's players spend in penalty - perhaps a larger number is indicative of a more "aggressive", edgy playing style. 
 
 ```{r Create penaltyGamesRatio Variable}
 team_totals_data <- mutate(team_totals_data, penaltyGamesRatio = penaltyMinutes / gamesPlayed)
@@ -223,7 +226,7 @@ team_totals_data %>%
   head()
 ```
 
-I then calculated an **overall** "win-to-loss" ratio, by dividing total number of wins by total number of losses. My hope here was to create a standardized measure, controlling for the amount of time that a team had been in operation, so that new teams and old teams could be compared equitably. Upon printing the first six rows of the data, we see that the Vegas Golden Knights - a team that just began in 2017 - has the highest win-to-loss ratio. 
+I then calculated an **overall** Win-Loss ratio, by dividing total number of wins by total number of losses. My hope here was to create a standardized measure, controlling for the amount of time that a team had been in operation, so that new teams and old teams could be compared equitably. Upon printing the first six rows of the data, we see that the Vegas Golden Knights - a team that just began in 2017 - has the highest win-to-loss ratio. 
 ```{r Calculate Overall Win-Loss Ratio}
 team_totals_data <- mutate(team_totals_data, winLossRatio = wins / losses)
 team_totals_data %>%
@@ -232,7 +235,7 @@ team_totals_data %>%
   head()
 ```
 
-I then created another variable: **MoreWinsOrLosses**, using `ifelse`. If a team won more than it lost (that is, its winLossRatio > 1), then the value of MoreWinsOrLosses was designated as "More Wins". Otherwise, it was assigned a value of "More Losses". *(For the purposes of this project, I designated the scenario of an equal number of wins and losses as "More Losses".)*
+I then created a categorical variable called **MoreWinsOrLosses**, using `ifelse`. If a team won more than it lost (that is, its winLossRatio > 1), then the value of MoreWinsOrLosses was designated as "More Wins". Otherwise, it was assigned a value of "More Losses". *(For the purposes of this project, I designated the scenario of an equal number of wins and losses as "More Losses".)*
 ```{r Create Categorical Variable MoreWinsOrLosses}
 team_totals_data <- mutate(team_totals_data, moreWinsOrLosses = ifelse(winLossRatio > 1, "More Wins", "More Losses"))
 team_totals_data %>%
@@ -241,16 +244,17 @@ team_totals_data %>%
   head(10)
 ```
 
+I also created two contingency tables using the new variable. Winning teams appear to be both more likely to still be an active franchise, as well as more likely to achieve shutout games. 
 ```{r Contingency Table of Franchise vs. Shutouts}
-shutoutTable <- table(team_totals_data$activeFranchise, team_totals_data$shutoutRange)
-kable(shutoutTable, caption="Table of Active or Non-Active Franchise vs. Total Number of Shutouts")
+shutoutTable <- table(team_totals_data$moreWinsOrLosses, team_totals_data$activeFranchise)
+kable(shutoutTable, caption="Table of More Wins or Losses vs. Active or Non-Active Franchise")
 ```
 
 ```{r Contingency Table of More Wins or Losses vs. Shutout Range}
-kable(table(team_totals_data$moreWinsOrLosses, team_totals_data$shutoutRange), caption="Contingency Table of More Wins or Losses and Shutout Range")
+kable(table(team_totals_data$moreWinsOrLosses, team_totals_data$shutoutRange), caption="Contingency Table of More Wins or Losses vs. Shutout Range")
 ```
 
-Looking at the resulting boxplot *(below)*, we can see that the median amount of time spent in the penalty box by a "winning" team is greater than that of a "losing" team. Yet interestingly, the winning team range is much, much shorter than that of a losing team, and two losing teams prove to be outliers, with one team spending an average of *over 30 minutes a game* in the penalty box. 
+Looking at the resulting boxplot *(below)*, we can see that the median amount of time spent in the penalty box by a "winning" team is greater than that of a "losing" team. Yet interestingly, the winning team range is much, much narrower than that of a losing team, and two losing teams prove to be outliers, with one team spending an average of *over 30 minutes a game* in the penalty box. 
 
 ```{r Creating Boxplot of Average Time Spent in Penalty Box}
 penalty_plot <- ggplot(team_totals_data, aes(x=penaltyGamesRatio,y=moreWinsOrLosses))
@@ -260,7 +264,7 @@ penalty_plot +
   labs (x="Ratio of Total Minutes in Penalty Box to Total Number of Games Played", y="'Winning' or 'Losing' Team?")
 ```
 
-Looking at the scatterplot, does not appear to be a straight-line relationship between the amount of time that a team spends in the penalty box and its Win-Loss ratio. Looking at the distribution of the points, it seems that there may be a "sweet spot" - perhaps indicating that making certain illegal or more aggressive plays that could be risky, but be rewarding. 
+Looking at the scatterplot, there does not appear to be a straight-line relationship between the amount of time that a team spends in the penalty box and its Win-Loss ratio. Looking at the distribution of the points, it seems that there may be a "sweet spot" - perhaps indicating that making certain illegal or more aggressive plays that could be risky, but rewarding. 
 
 ```{r Creating Scatterplot of the Penalty-Games Ratio and Win-Loss Ratio, message=FALSE}
 ratiosScatter <- ggplot(team_totals_data, aes(x=penaltyGamesRatio, y=winLossRatio))
@@ -293,19 +297,22 @@ summary(pre2000Penalties$penaltyGamesRatio)
 
 ## How are Weak Goalies Affecting Teams' Performances? 
 
-The [Goals Against Average](https://en.wikipedia.org/wiki/Goals_against_average) indicates "the number of goals a goaltender allows per 60 minutes of playing time" - that is, per one game. The column goalsAgainst in the dataset is a cumulative measure, indicating the total number of Goals Against for the team since its inception. We can average this as a "per game" value by dividing the goalsAgainst by the total number of games played. After creating that new variable, I then plotted this value against the total Win-Loss ratio. Of course, there appears to be a negative correlation between the two values: the larger the number of goals that a team's goalies have let in, the lower their win-loss ratio. I colored the values on the scatterplot by whether or not a team is still an active franchise - indeed, the greater the number of goals are let in, the lower the number of wins... and seemingly, the less likely they are to still be an active franchise. The active franchises appear to have a much lower Goals Against Ratio, and a much higher Win-Loss ratio. 
+The [Goals Against Average](https://en.wikipedia.org/wiki/Goals_against_average) indicates "the number of goals a goaltender allows per 60 minutes of playing time" - that is, per one game. The column goalsAgainst in the dataset is a cumulative measure, indicating the total number of Goals Against for the team since its inception. We can average this as a "per game" value by dividing the goalsAgainst by the total number of games played. After creating that new variable, I then plotted this value against the total Win-Loss ratio. Of course, there appears to be a weak negative correlation between the two values, with r= -0.421: the larger the number of goals that a team's goalies have let in, the lower their win-loss ratio. I set the colors of the values on the scatterplot by whether or not a team is still an active franchise - indeed, the greater the number of goals are let in, the lower the number of wins... and seemingly, the less likely they are to still be an active franchise. The active franchises appear to have a much lower Goals Against Ratio, and a much higher Win-Loss ratio. 
 
 ```{r Creating Scatterplot of Goals Against vs. Losses, message=FALSE}
 
 team_totals_data$activeFranchise <- as.logical(team_totals_data$activeFranchise)
 team_totals_data <- mutate(team_totals_data, goalsAgainstRatio = goalsAgainst / gamesPlayed)
+correlation <- cor(team_totals_data$goalsAgainstRatio, team_totals_data$winLossRatio)
+correlation
 
 goalsAgainstLossesPlot <- ggplot(team_totals_data, aes(x=goalsAgainstRatio, y=winLossRatio, color=activeFranchise))
 goalsAgainstLossesPlot + 
   geom_point() + 
   geom_smooth(method=lm) +
   ggtitle("Scatterplot of Goals Against vs. Win-Loss Ratio") +
-  labs(x="Goals Against Ratio", y="Win-Loss Ratio")
+  labs(x="Goals Against Ratio", y="Win-Loss Ratio") +
+  scale_color_discrete(name="Active?", labels=c("No","Yes"))
 ```
 
 
