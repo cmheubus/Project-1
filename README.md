@@ -1,4 +1,4 @@
-ST 558 - Project 1
+Ice Ice Baby: Exploring the NHL Franchise API Using jsonlite and ggplot2
 ================
 Christine Marie Heubusch
 June 12, 2020
@@ -371,10 +371,8 @@ penalty_plot +
 roadWinsLossesHist <- ggplot(team_totals_data, aes(x=roadWinLossRatio))
 roadWinsLossesHist +
   geom_histogram(aes(y=..density..), binwidth=0.25) + 
-  geom_density(kernal="gaussian")
+  geom_density(kernel="gaussian")
 ```
-
-    ## Warning: Ignoring unknown parameters: kernal
 
 ![](README_files/figure-gfm/Creating%20Histogram%20of%20Road%20Wins%20to%20Road%20Losses%20Ratio-1.png)<!-- -->
 
@@ -392,7 +390,7 @@ roadWinsLossesHist +
 homeWinsLossesHist <- ggplot(team_totals_data, aes(x=homeWinLossRatio))
 homeWinsLossesHist +
   geom_histogram(aes(y=..density..), binwidth=0.25) + 
-  geom_density(kernal="gaussian") + 
+  geom_density(kernel="gaussian") + 
   ggtitle("Histogram of Home Wins to Home Losses Ratio")
 ```
 

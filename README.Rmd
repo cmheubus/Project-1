@@ -1,5 +1,5 @@
 ---
-title: "ST 558 - Project 1"
+title: "Ice Ice Baby: Exploring the NHL Franchise API Using jsonlite and ggplot2"
 output: 
   rmarkdown::github_document: 
     toc: true
@@ -201,7 +201,7 @@ penalty_plot +
 roadWinsLossesHist <- ggplot(team_totals_data, aes(x=roadWinLossRatio))
 roadWinsLossesHist +
   geom_histogram(aes(y=..density..), binwidth=0.25) + 
-  geom_density(kernal="gaussian")
+  geom_density(kernel="gaussian")
   ggtitle("Histogram of Road Wins to Road Losses Ratio")
 ```
 
@@ -209,7 +209,7 @@ roadWinsLossesHist +
 homeWinsLossesHist <- ggplot(team_totals_data, aes(x=homeWinLossRatio))
 homeWinsLossesHist +
   geom_histogram(aes(y=..density..), binwidth=0.25) + 
-  geom_density(kernal="gaussian") + 
+  geom_density(kernel="gaussian") + 
   ggtitle("Histogram of Home Wins to Home Losses Ratio")
 ```
 
