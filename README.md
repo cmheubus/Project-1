@@ -28,8 +28,8 @@ June 12, 2020
         More?](#do-aggressive-teams-tend-to-win-more)
       - [Do Newer Teams Tend to be More
         Aggressive?](#do-newer-teams-tend-to-be-more-aggressive)
-      - [How are Weak Goalies Affecting a Teams’
-        Performances?](#how-are-weak-goalies-affecting-a-teams-performances)
+      - [How are Weak Goalies Affecting Teams’
+        Performances?](#how-are-weak-goalies-affecting-teams-performances)
 
 # Understanding JSON Data
 
@@ -542,7 +542,7 @@ summary(pre2000Penalties$penaltyGamesRatio)
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##    4.50   11.91   14.20   14.83   17.11   30.43
 
-## How are Weak Goalies Affecting a Teams’ Performances?
+## How are Weak Goalies Affecting Teams’ Performances?
 
 The [Goals Against
 Average](https://en.wikipedia.org/wiki/Goals_against_average) indicates
