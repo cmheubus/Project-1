@@ -124,7 +124,7 @@ skaterPenguins <- api_function_skater(17) #Testing the function - sure, I suppos
 
 ## Is a Team With More Recorded Shutouts More Likely to Still be an Active Franchise? 
 
-In a [shutout game](https://en.wikipedia.org/wiki/Shutout), a hockey team's defense manages to prevent the other team from scoring any points throughout the entirety of the game - surely, a sign of strong performance! To begin, I decided to created a categorical variable called **shutoutRange**, which defined each 
+In a [shutout game](https://en.wikipedia.org/wiki/Shutout), a hockey team's defense manages to prevent the other team from scoring any points throughout the entirety of the game - surely, a sign of strong performance! To begin, I decided to created a categorical variable called **shutoutRange**, creating ranges for total number of shutouts and using `ifelse` to assign each value to the appropriate level of the new variable. I then created a contingency table to get a quick glimpse of how many active (and inactive) franchises fell within each category. Not too surprisingly, none of the teams that had a history of over a 100 shutouts were inactive. To visualize this data, I created a barplot, filling the bars with color based upon whether or not the franchise is active.
 
 ```{r Creating shutoutRange Variable}
 team_totals_data <- mutate(team_totals_data, shutoutRange = 
@@ -140,15 +140,7 @@ shutoutTable <- table(team_totals_data$activeFranchise, team_totals_data$shutout
 kable(shutoutTable, caption="Table of Active or Non-Active Franchise vs. Total Number of Shutouts")
 ```
 
-```{r Creating a Numeric Summary of the Shutouts}
-#shutoutsSummary<- team_totals_data$shutouts %>%
-#  filter(activeFranchise=="1") %>%
-#  summary()
-#shutoutsSummary
-```
-
-```{r}
-#CUSTOMIZE COLORS
+```{r Creating Bar Plot of Number of Shutouts, with Active Franchise}
 shutoutGraph<- ggplot(data=team_totals_data, aes(x=shutoutRange))
 shutoutGraph + geom_bar(aes(fill=as.factor(activeFranchise))) + 
   labs(x="Total Number of Shutouts", title="Bar Plot of Number of Shutouts") + 
@@ -158,19 +150,20 @@ shutoutGraph + geom_bar(aes(fill=as.factor(activeFranchise))) +
 
 ## Are Teams more Likely to Win at Home than Away? 
 
-We've heard of "home-field" advantage - let's see if the same can be said of the rink.
+We've heard of home-"field" advantage - let's see if the same can be said of the rink.I began by creating another two variables: 
 
-I created a ratio 
-Ratio of RoadWin:RoadLoss and HomeWin:HomeLoss, then do 
-Did not count ties
+* **roadWinLossRatio**, AKA total number of wins on the road divided by total number of losses on the road  
+* **homeWinLossRaio**, AKA total number of losses at home divided by total number of wins on the road  
+
+*For this purposes of this variable, I did not include ties.*
+
 ```{r Create roadWinLossRatio and homeWinLossRatio variables}
 team_totals_data <- mutate(team_totals_data, roadWinLossRatio = roadWins / roadLosses)
 team_totals_data <- mutate(team_totals_data, homeWinLossRatio = homeWins / homeLosses)
-team_totals_data <- mutate(team_totals_data, percentLossAway = roadWins / wins)
-team_totals_data <- mutate(team_totals_data, percentWinAway = homeWins / wins)
+
 team_totals_data %>%
   select(teamName, roadWinLossRatio, homeWinLossRatio) %>%
-  arrange(desc(roadWinLossRatio)) %>%
+  arrange(teamName) %>%
   head()
 ```
 
@@ -184,7 +177,7 @@ homeWLR <- summary(team_totals_data$homeWinLossRatio)
 homeWLR
 ```
 
-Looking at the mean and median win-to-loss ratios for on the road (or "away") and home, we see that both the home mean and median ratios are nearly double for home games - perhaps indicating that a time is more likely to win when it's playing on its home ice. We can then look at boxplots of these ratios, as a visual representation of these summary statistics.  
+Looking at the mean and median win-to-loss ratios for on the road (or "away") and home, we see that both the home mean and median ratios are nearly double for home games - perhaps indicating that a team is more likely to win when it's playing on its own ice. We can then look at boxplots of these ratios, as a visual representation of these summary statistics.  
 
 ```{r Creating Boxplot of roadWinToLossRatio}
 penalty_plot <- ggplot(team_totals_data, aes(x=roadWinLossRatio,y=""))
@@ -194,7 +187,7 @@ penalty_plot +
   labs(x="Ratio of Road Wins, Divided by Road Losses", y="")
 ```
 
-```{r Creating Boxplot of home WinLossRatio}
+```{r Creating Boxplot of home WinLossRatio, warning=FALSE}
 penalty_plot <- ggplot(team_totals_data, aes(x=homeWinLossRatio,y=""))
 penalty_plot + 
   geom_boxplot(fill="#cc0000") +
@@ -209,7 +202,7 @@ roadWinsLossesHist +
   ggtitle("Histogram of Road Wins : Losses Ratio")
 ```
 
-```{r Creating Histogram of Home Wins to Losses Ratio}
+```{r Creating Histogram of Home Wins to Losses Ratio, warning=FALSE}
 homeWinsLossesHist <- ggplot(team_totals_data, aes(x=homeWinLossRatio))
 homeWinsLossesHist +
   geom_histogram(aes(y=..density..), binwidth=0.25) + 
@@ -232,7 +225,7 @@ team_totals_data %>%
 ```
 
 I then calculated an **overall** "win-to-loss" ratio, by dividing total number of wins by total number of losses. My hope here was to create a standardized measure, controlling for the amount of time that a team had been in operation, so that new teams and old teams could be compared equitably. Upon printing the first six rows of the data, we see that the Vegas Golden Knights - a team that just began in 2017 - has the highest win-to-loss ratio. 
-```{r}
+```{r Calculate Overall Win-Loss Ratio}
 team_totals_data <- mutate(team_totals_data, winLossRatio = wins / losses)
 team_totals_data %>%
   select (teamName, winLossRatio) %>%
@@ -241,7 +234,7 @@ team_totals_data %>%
 ```
 
 I then created another variable: **MoreWinsOrLosses**, using `ifelse`. If a team won more than it lost (that is, its winLossRatio > 1), then the value of MoreWinsOrLosses was designated as "More Wins". Otherwise, it was assigned a value of "More Losses". *(For the purposes of this project, I designated the scenario of an equal number of wins and losses as "More Losses".)*
-```{r}
+```{r Create Categorical Variable MoreWinsOrLosses}
 team_totals_data <- mutate(team_totals_data, moreWinsOrLosses = ifelse(winLossRatio > 1, "More Wins", "More Losses"))
 team_totals_data %>%
   select(teamName, winLossRatio, moreWinsOrLosses) %>%
@@ -249,9 +242,18 @@ team_totals_data %>%
   head(10)
 ```
 
+```{r Contingency Table of Franchise vs. Shutouts}
+shutoutTable <- table(team_totals_data$activeFranchise, team_totals_data$shutoutRange)
+kable(shutoutTable, caption="Table of Active or Non-Active Franchise vs. Total Number of Shutouts")
+```
+
+```{r Contingency Table of More Wins or Losses vs. Shutout Range}
+kable(table(team_totals_data$moreWinsOrLosses, team_totals_data$shutoutRange), caption="Contingency Table of More Wins or Losses and Shutout Range")
+```
+
 Looking at the resulting boxplot *(below)*, we can see that the median amount of time spent in the penalty box by a "winning" team is greater than that of a "losing" team. Yet interestingly, the winning team range is much, much shorter than that of a losing team, and two losing teams prove to be outliers, with one team spending an average of *over 30 minutes a game* in the penalty box. 
 
-```{r}
+```{r Creating Boxplot of Average Time Spent in Penalty Box}
 penalty_plot <- ggplot(team_totals_data, aes(x=penaltyGamesRatio,y=moreWinsOrLosses))
 penalty_plot + 
   geom_boxplot(fill="#cc0000") +
@@ -259,9 +261,9 @@ penalty_plot +
   labs (x="Ratio of Total Minutes in Penalty Box to Total Number of Games Played", y="'Winning' or 'Losing' Team?")
 ```
 
-There does not appear to be a straight-line relationship between the amount of time that a team spends in the penalty box and its "win-loss" ratio. Looking at the distribution of the points, it seems that there may be a "sweet spot" - perhaps indicating that making certain illegal or more aggressive plays that could be risky, but be rewarding. 
+Looking at the scatterplot, does not appear to be a straight-line relationship between the amount of time that a team spends in the penalty box and its Win-Loss ratio. Looking at the distribution of the points, it seems that there may be a "sweet spot" - perhaps indicating that making certain illegal or more aggressive plays that could be risky, but be rewarding. 
 
-```{r}
+```{r Creating Scatterplot of the Penalty-Games Ratio and Win-Loss Ratio, message=FALSE}
 ratiosScatter <- ggplot(team_totals_data, aes(x=penaltyGamesRatio, y=winLossRatio))
 ratiosScatter +
   geom_point() +
@@ -272,7 +274,9 @@ ratiosScatter +
 
 ## Do Newer Teams Tend to be More Aggressive? 
 
-```{r}
+For this brief analysis, I filtered the dataset twice: once for years after or equal to 2000 (season stored as 20002001), then for years before 2000. I then took summary statistics for each of the ratios of Penalty to Games. In this case, we see that the median and mean for teams before 2000 is actually higher than that of teams that began in or after 2000, perhaps indicating that newer teams are actually less likely to be in the penalty box.
+
+```{r Getting Penalty Summary Statistics for Teams Started in or After 2000}
 post2000Penalties<- team_totals_data %>% 
   filter(firstSeasonId >= 20002000) %>% 
   select(teamName, penaltyGamesRatio, firstSeasonId) %>% 
@@ -280,7 +284,7 @@ post2000Penalties<- team_totals_data %>%
 summary(post2000Penalties$penaltyGamesRatio)
 ```
 
-```{r}
+```{r Getting Penalty Summary Statistics for Teams Started Before 2000}
 pre2000Penalties <- team_totals_data %>% 
   filter(firstSeasonId < 20002000) %>% 
   select(teamName, penaltyGamesRatio, firstSeasonId) %>% 
@@ -288,7 +292,7 @@ pre2000Penalties <- team_totals_data %>%
 summary(pre2000Penalties$penaltyGamesRatio)
 ```
 
-## How are Weak Goalies Affecting a Team's Performance? 
+## How are Weak Goalies Affecting a Teams' Performances? 
 
 The [Goals Against Average](https://en.wikipedia.org/wiki/Goals_against_average) indicates "the number of goals a goaltender allows per 60 minutes of playing time" - that is, per one game. The column goalsAgainst in the dataset is a cumulative measure, indicating the total number of Goals Against for the team since its inception. We can average this as a "per game" value by dividing the goalsAgainst by the total number of games played. After creating that new variable, I then plotted this value against the total Win-Loss ratio. Of course, there appears to be a negative correlation between the two values: the larger the number of goals that a team's goalies have let in, the lower their win-loss ratio. I colored the values on the scatterplot by whether or not a team is still an active franchise - indeed, the greater the number of goals are let in, the lower the number of wins... and seemingly, the less likely they are to still be an active franchise. The active franchises appear to have a much lower Goals Against Ratio, and a much higher Win-Loss ratio. 
 
@@ -302,8 +306,7 @@ goalsAgainstLossesPlot +
   geom_point() + 
   geom_smooth(method=lm) +
   ggtitle("Scatterplot of Goals Against vs. Win-Loss Ratio") +
-  labs(x="Goals Against Ratio", y="Win-Loss Ratio") +
-  scale_fill_discrete(name="Active Franchise?", labels=c("No","Yes"))
+  labs(x="Goals Against Ratio", y="Win-Loss Ratio")
 ```
 
 
