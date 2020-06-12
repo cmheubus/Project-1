@@ -1,5 +1,5 @@
 ---
-title: "Ice Ice Baby: Exploring the NHL Franchise API Using jsonlite and ggplot2"
+title: "Exploring the NHL Franchise API Using jsonlite and ggplot2"
 output: 
   rmarkdown::github_document: 
     toc: true
