@@ -291,7 +291,7 @@ pre2000Penalties <- team_totals_data %>%
 summary(pre2000Penalties$penaltyGamesRatio)
 ```
 
-## How are Weak Goalies Affecting a Teams' Performances? 
+## How are Weak Goalies Affecting Teams' Performances? 
 
 The [Goals Against Average](https://en.wikipedia.org/wiki/Goals_against_average) indicates "the number of goals a goaltender allows per 60 minutes of playing time" - that is, per one game. The column goalsAgainst in the dataset is a cumulative measure, indicating the total number of Goals Against for the team since its inception. We can average this as a "per game" value by dividing the goalsAgainst by the total number of games played. After creating that new variable, I then plotted this value against the total Win-Loss ratio. Of course, there appears to be a negative correlation between the two values: the larger the number of goals that a team's goalies have let in, the lower their win-loss ratio. I colored the values on the scatterplot by whether or not a team is still an active franchise - indeed, the greater the number of goals are let in, the lower the number of wins... and seemingly, the less likely they are to still be an active franchise. The active franchises appear to have a much lower Goals Against Ratio, and a much higher Win-Loss ratio. 
 
